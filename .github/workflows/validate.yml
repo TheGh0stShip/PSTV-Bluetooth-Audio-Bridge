@@ -33,7 +33,7 @@ jobs:
           fi
       - name: Check user-facing release text
         run: |
-          version=$(sed -n "s/^\$releaseVersion = '\([^']*\)'/\1/p" installer/Install.ps1)
+          version=$(grep -oE '[0-9]+\.[0-9]+\.[0-9]+' installer/Install.ps1 | head -n 1)
           test -n "$version"
           test -f ".github/release-notes/v${version}.md"
           if grep -R -n -F '\n' .github/release-notes; then
