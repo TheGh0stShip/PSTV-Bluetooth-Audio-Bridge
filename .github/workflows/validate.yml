@@ -17,7 +17,9 @@ jobs:
       - name: Check appliance and build scripts
         run: |
           shellcheck -x build/build-appliance.sh
-          find appliance/rootfs -type f \( -path '*/init.d/*' -o -path '*/local/sbin/*' \) -print0 | xargs -0 shellcheck
+          find appliance/rootfs/usr/local/sbin -type f -print0 | xargs -0 shellcheck
+          # OpenRC service variables are consumed by openrc-run, not this file.
+          find appliance/rootfs/etc/init.d -type f -print0 | xargs -0 shellcheck -s sh -e SC2034
 
   powershell:
     runs-on: windows-latest
