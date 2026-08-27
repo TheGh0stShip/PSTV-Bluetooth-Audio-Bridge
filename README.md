@@ -86,3 +86,7 @@ This project is independent community software and is not affiliated with or end
 ## License
 
 Original project code is MIT licensed. Vendored BlueALSA source remains GPL-3.0-or-later, and VitaBtFix remains MIT licensed by its author. See [Third-Party Notices](THIRD_PARTY_NOTICES.md).
+
+---
+
+[![Repository visitors](https://hits.sh/github.com/TheGh0stShip/PSTV-Bluetooth-Audio-Bridge.svg?view=total&style=flat-square&label=Visitors&color=0e75b6)](https://hits.sh/github.com/TheGh0stShip/PSTV-Bluetooth-Audio-Bridge/)
