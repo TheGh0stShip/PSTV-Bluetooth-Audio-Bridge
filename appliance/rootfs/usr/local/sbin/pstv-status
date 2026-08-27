@@ -1,0 +1,28 @@
+#!/bin/sh
+set -u
+
+paired=$(bluetoothctl devices Paired 2>/dev/null | awk '/^Device / { print $2; exit }')
+connected=$(bluetoothctl devices Connected 2>/dev/null | awk '/^Device / { print $2; exit }')
+
+if [ "${1:-}" = "--paired" ]; then
+	[ -n "$paired" ] || exit 1
+	printf '%s\n' "$paired"
+	exit 0
+fi
+
+adapter=no
+hciconfig hci0 >/dev/null 2>&1 && adapter=yes
+bluealsa=stopped
+rc-service bluealsa status >/dev/null 2>&1 && bluealsa=started
+player=stopped
+rc-service bluealsa-aplay status >/dev/null 2>&1 && player=started
+pcm=idle
+bluealsa-cli list-pcms 2>/dev/null | grep -q . && pcm=ready
+
+echo "adapter=$adapter"
+echo "paired=${paired:-none}"
+echo "connected=${connected:-none}"
+echo "bluealsa=$bluealsa"
+echo "player=$player"
+echo "pcm=$pcm"
+

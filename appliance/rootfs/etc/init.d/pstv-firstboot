@@ -1,0 +1,11 @@
+#!/sbin/openrc-run
+
+name="PSTV bridge first-boot provisioning"
+command="/usr/local/sbin/pstv-firstboot"
+command_background="no"
+
+depend() {
+	need open-vm-tools
+	before sshd
+}
+

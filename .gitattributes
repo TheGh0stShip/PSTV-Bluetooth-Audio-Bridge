@@ -1,0 +1,9 @@
+* text=auto
+
+*.sh text eol=lf
+appliance/rootfs/etc/init.d/* text eol=lf
+appliance/rootfs/usr/local/sbin/* text eol=lf
+*.ps1 text eol=crlf
+
+*.exe binary
+*.skprx binary

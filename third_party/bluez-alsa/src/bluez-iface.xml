@@ -1,0 +1,94 @@
+<!-- BlueALSA - bluez-iface.xml
+     Copyright (c) 2016-2024 Arkadiusz Bokowy
+
+     This file is a part of bluez-alsa.
+
+     This project is licensed under the terms of the MIT license.
+-->
+<node>
+
+	<!-- NOTE: Due to a bug in gdbus-codegen in glib prior to 2.61.0,
+	           the first interface must have at least one method.
+	-->
+
+	<interface name="org.bluez.GattCharacteristic1">
+		<annotation name="org.gtk.GDBus.CPP.if" value="ENABLE_MIDI"/>
+		<method name="ReadValue">
+			<arg direction="in" type="a{sv}" name="options"/>
+			<arg direction="out" type="ay" name="value"/>
+		</method>
+		<method name="AcquireWrite">
+			<arg direction="in" type="a{sv}" name="options"/>
+			<arg direction="out" type="h" name="fd"/>
+			<arg direction="out" type="q" name="mtu"/>
+		</method>
+		<method name="AcquireNotify">
+			<arg direction="in" type="a{sv}" name="options"/>
+			<arg direction="out" type="h" name="fd"/>
+			<arg direction="out" type="q" name="mtu"/>
+		</method>
+		<property name="UUID" type="s" access="read"/>
+		<property name="Service" type="o" access="read"/>
+		<property name="WriteAcquired" type="b" access="read"/>
+		<property name="NotifyAcquired" type="b" access="read"/>
+		<property name="Flags" type="as" access="read"/>
+	</interface>
+
+	<interface name="org.bluez.GattService1">
+		<annotation name="org.gtk.GDBus.CPP.if" value="ENABLE_MIDI"/>
+		<property name="UUID" type="s" access="read"/>
+		<property name="Primary" type="b" access="read"/>
+	</interface>
+
+	<interface name="org.bluez.LEAdvertisement1">
+		<annotation name="org.gtk.GDBus.CPP.if" value="ENABLE_MIDI"/>
+		<method name="Release">
+		</method>
+		<property name="Type" type="s" access="read"/>
+		<property name="ServiceUUIDs" type="as" access="read"/>
+		<property name="Discoverable" type="b" access="read"/>
+		<property name="Includes" type="as" access="read"/>
+	</interface>
+
+	<interface name="org.bluez.MediaEndpoint1">
+		<method name="SelectConfiguration">
+			<arg direction="in" type="ay" name="capabilities"/>
+			<arg direction="out" type="ay" name="configuration"/>
+		</method>
+		<method name="SetConfiguration">
+			<arg direction="in" type="o" name="transport"/>
+			<arg direction="in" type="a{sv}" name="properties"/>
+		</method>
+		<method name="ClearConfiguration">
+			<arg direction="in" type="o" name="transport"/>
+		</method>
+		<method name="Release">
+		</method>
+		<property name="UUID" type="s" access="read"/>
+		<property name="Codec" type="y" access="read"/>
+		<property name="Vendor" type="u" access="read"/>
+		<property name="Capabilities" type="ay" access="read"/>
+		<property name="Device" type="o" access="read"/>
+		<property name="DelayReporting" type="b" access="read"/>
+	</interface>
+
+	<interface name="org.bluez.BatteryProvider1">
+		<property name="Device" type="o" access="read"/>
+		<property name="Percentage" type="y" access="read"/>
+		<property name="Source" type="s" access="read"/>
+	</interface>
+
+	<interface name="org.bluez.Profile1">
+		<method name="NewConnection">
+			<arg direction="in" type="o" name="device"/>
+			<arg direction="in" type="h" name="fd"/>
+			<arg direction="in" type="a{sv}" name="properties"/>
+		</method>
+		<method name="RequestDisconnection">
+			<arg direction="in" type="o" name="device"/>
+		</method>
+		<method name="Release">
+		</method>
+	</interface>
+
+</node>

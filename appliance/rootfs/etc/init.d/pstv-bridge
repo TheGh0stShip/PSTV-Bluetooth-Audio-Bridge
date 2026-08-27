@@ -1,0 +1,14 @@
+#!/sbin/openrc-run
+
+name="PSTV Bluetooth link keeper"
+command="/usr/local/sbin/pstv-bridge-daemon"
+command_background="yes"
+pidfile="/run/pstv-bridge.pid"
+output_log="/var/log/pstv-bridge.log"
+error_log="/var/log/pstv-bridge.log"
+
+depend() {
+	need bluetooth bluealsa
+	after pstv-firstboot
+}
+

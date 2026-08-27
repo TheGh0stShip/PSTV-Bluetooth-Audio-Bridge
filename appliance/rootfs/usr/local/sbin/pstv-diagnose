@@ -1,0 +1,23 @@
+#!/bin/sh
+set -u
+
+echo "PSTV Bluetooth Audio Bridge diagnostics"
+echo "date=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+echo "kernel=$(uname -r)"
+echo "bluealsa=$(/usr/local/sbin/bluealsa-pstv --version 2>&1 | head -n 1)"
+/usr/local/sbin/pstv-status
+echo
+hciconfig -a 2>/dev/null || true
+echo
+hcitool con 2>/dev/null || true
+for mac in $(hcitool con 2>/dev/null | awk '/ ACL / { print $3 }'); do
+	hcitool lq "$mac" 2>/dev/null || true
+	hcitool rssi "$mac" 2>/dev/null || true
+done
+echo
+aplay -l 2>/dev/null || true
+echo
+tail -n 40 /var/log/bluealsa.log 2>/dev/null || true
+tail -n 40 /var/log/bluealsa-aplay.log 2>/dev/null || true
+tail -n 40 /var/log/pstv-bridge.log 2>/dev/null || true
+

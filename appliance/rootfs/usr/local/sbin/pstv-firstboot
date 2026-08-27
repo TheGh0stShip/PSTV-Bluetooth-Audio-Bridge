@@ -1,0 +1,36 @@
+#!/bin/sh
+set -eu
+
+state_dir=/var/lib/pstv-bridge
+marker="$state_dir/provisioned"
+[ -e "$marker" ] && exit 0
+
+mkdir -p "$state_dir"
+
+admin_password=
+attempt=0
+while [ "$attempt" -lt 60 ]; do
+	encoded=$(vmtoolsd --cmd 'info-get guestinfo.pstv_admin_password' 2>/dev/null || true)
+	if [ -n "$encoded" ] && [ "$encoded" != "No value found" ]; then
+		admin_password=$(printf '%s' "$encoded" | base64 -d 2>/dev/null || true)
+		[ "${#admin_password}" -ge 32 ] && break
+		admin_password=
+	fi
+	sleep 2
+	attempt=$((attempt + 1))
+done
+
+if [ -z "$admin_password" ]; then
+	echo "No valid guestinfo.pstv_admin_password was supplied" >&2
+	exit 1
+fi
+
+printf 'root:%s\n' "$admin_password" | chpasswd
+admin_password=
+vmtoolsd --cmd 'info-set guestinfo.pstv_admin_password ""' >/dev/null 2>&1 || true
+
+rm -f /etc/ssh/ssh_host_*
+ssh-keygen -A
+
+date -u +%Y-%m-%dT%H:%M:%SZ > "$marker"
+chmod 600 "$marker"

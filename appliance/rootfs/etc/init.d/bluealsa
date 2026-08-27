@@ -1,0 +1,15 @@
+#!/sbin/openrc-run
+
+name="BlueALSA PSTV A2DP sink"
+command="/usr/local/sbin/bluealsa-pstv"
+command_args="-S -p a2dp-sink -c SBC --keep-alive=5 --io-rt-priority=30"
+command_background="yes"
+pidfile="/run/bluealsa.pid"
+output_log="/var/log/bluealsa.log"
+error_log="/var/log/bluealsa.log"
+
+depend() {
+	need dbus bluetooth
+	after bluetooth
+}
+

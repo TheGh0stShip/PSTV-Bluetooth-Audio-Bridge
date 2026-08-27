@@ -1,0 +1,50 @@
+name: Validate source
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  shell:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install shellcheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+      - name: Check appliance and build scripts
+        run: |
+          shellcheck -x build/build-appliance.sh
+          find appliance/rootfs -type f \( -path '*/init.d/*' -o -path '*/local/sbin/*' \) -print0 | xargs -0 shellcheck
+
+  powershell:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse PowerShell scripts
+        shell: pwsh
+        run: |
+          $failed = $false
+          Get-ChildItem -Recurse -Filter *.ps1 | ForEach-Object {
+            $tokens = $null
+            $errors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$tokens, [ref]$errors)
+            if ($errors.Count) {
+              $failed = $true
+              $errors | ForEach-Object { Write-Error "$($_.Extent.File):$($_.Extent.StartLineNumber): $($_.Message)" }
+            }
+          }
+          if ($failed) { exit 1 }
+
+  hygiene:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reject private and runtime artifacts
+        run: |
+          if find . -type f \( -name 'id_ed25519*' -o -name 'admin-password.txt' -o -name 'hostkey.txt' -o -name '*.vmem' -o -name '*.vmss' -o -name '*.btsnoop' -o -name 'known_hosts' \) | grep -q .; then
+            echo 'Private or runtime artifact found in repository.' >&2
+            exit 1
+          fi

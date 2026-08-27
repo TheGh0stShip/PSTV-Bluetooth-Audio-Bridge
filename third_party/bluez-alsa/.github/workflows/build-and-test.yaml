@@ -1,0 +1,164 @@
+name: Build and Test
+
+on:
+  push:
+  pull_request:
+    branches: [ master ]
+
+env:
+  MAKEFLAGS: -j8
+  SANITIZE_THREAD_LIBS: ${{ github.workspace }}/sanitize-thread-libs
+
+jobs:
+
+  check:
+    strategy:
+      matrix:
+        features:
+        - --enable-debug
+        - --enable-debug --enable-aac --enable-msbc --enable-lc3-swb
+        - --enable-debug --enable-mp3lame --enable-mpg123
+        - --enable-faststream --enable-midi --enable-mp3lame
+        - --enable-aplay --enable-ofono --enable-opus --enable-upower
+        - --enable-cli --enable-rfcomm --enable-manpages
+        - --enable-aptx --enable-aptx-hd --with-libopenaptx
+      fail-fast: false
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install Dependencies
+      uses: ./.github/actions/apt-install-deps
+    - name: Create Build Environment
+      run: |
+        mkdir -p ${{ github.workspace }}/{build,m4}
+        autoreconf --install
+    - name: Configure GNU Automake
+      working-directory: ${{ github.workspace }}/build
+      run: |
+        ${{ github.workspace }}/configure \
+          ${{ matrix.features }} \
+          --enable-test
+    - name: Build
+      working-directory: ${{ github.workspace }}/build
+      run: make check CFLAGS="-Wall -Wextra -Werror -Wshadow" TESTS=
+    - name: Run Tests
+      working-directory: ${{ github.workspace }}/build/test
+      run: make check-TESTS
+    - name: Upload Tests Log
+      uses: actions/upload-artifact@v4
+      if: ${{ always() }}
+      with:
+        name: ${{ github.job }} (${{ matrix.features }}) logs
+        path: ${{ github.workspace }}/build/test/*.log
+
+  sanitize-prepare:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/cache@v4
+      id: cache
+      with:
+        key: sanitize-env
+        path: ${{ env.SANITIZE_THREAD_LIBS }}
+    - name: Create Build Environment
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        sudo apt install --yes --quiet --no-install-recommends autoconf-archive meson
+        mkdir -p ${{ env.SANITIZE_THREAD_LIBS }}
+    - name: Compile Patched GCC Thread Sanitizer Library
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        git clone --depth=1 --branch=releases/gcc-11.3.0 https://github.com/gcc-mirror/gcc.git
+        # GCC (and Clang) skips interception in case when the call is made while the
+        # thread is waiting on a blocking system call. In most cases this is a case
+        # when the call is made from a signal handler. However, BlueALSA uses thread
+        # cancellation to stop the thread, which operates in a similar way. Therefore,
+        # we need to patch the thread sanitizer library to not skip the interception.
+        sed -i 's/|| thr->ignore_interceptors//' gcc/libsanitizer/tsan/tsan_interceptors.h
+        mkdir libstdc++-v3 && cd $_ && ../gcc/libstdc++-v3/configure --disable-multilib && make && cd -
+        mkdir libsanitizer && cd $_ && ../gcc/libsanitizer/configure --disable-multilib && make && cd -
+        mv libsanitizer/tsan/.libs/libtsan.so* ${{ env.SANITIZE_THREAD_LIBS }}
+    - name: Compile dbus-1 with Thread Sanitizer
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        git clone --depth=1 --branch=dbus-1.12.20 https://gitlab.freedesktop.org/dbus/dbus.git
+        cd dbus && autoreconf -i && ./configure --prefix=/usr && make CFLAGS="-O2 -g -fsanitize=thread" && cd -
+        mv dbus/dbus/.libs/libdbus-1.so* ${{ env.SANITIZE_THREAD_LIBS }}
+    - name: Compile glib-2.0 with Thread Sanitizer
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        git clone --depth=1 --branch=2.72.4 https://github.com/GNOME/glib.git
+        CFLAGS="-O2 -g -fsanitize=thread" meson glib/build glib
+        DESTDIR=../build-image ninja -C glib/build install
+        mv glib/build-image/usr/local/lib/x86_64-linux-gnu/lib* ${{ env.SANITIZE_THREAD_LIBS }}
+
+  sanitize:
+    strategy:
+      matrix:
+        sanitize:
+        - address alignment bool bounds nonnull-attribute shift undefined
+        - thread
+      fail-fast: false
+    needs: sanitize-prepare
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install Dependencies
+      uses: ./.github/actions/apt-install-deps
+    - name: Create Build Environment
+      run: |
+        mkdir -p ${{ github.workspace }}/{build,m4}
+        autoreconf --install
+    - name: Configure GNU Automake
+      working-directory: ${{ github.workspace }}/build
+      run: |
+        ${{ github.workspace }}/configure \
+          --enable-aac \
+          --enable-aptx \
+          --enable-aptx-hd \
+          --with-libopenaptx \
+          --enable-faststream \
+          --enable-lc3-swb \
+          --enable-midi \
+          --enable-mp3lame \
+          --enable-mpg123 \
+          --enable-msbc \
+          --enable-ofono \
+          --enable-opus \
+          --enable-upower \
+          --enable-aplay \
+          --enable-cli \
+          --enable-test
+    - name: Build
+      working-directory: ${{ github.workspace }}/build
+      run: |
+        make clean
+        SANITIZERS=$(for x in ${{ matrix.sanitize }}; do echo -n " -fsanitize=$x"; done)
+        make check CFLAGS="-g -O2 $SANITIZERS -fno-sanitize-recover=all" TESTS=
+    - uses: actions/cache/restore@v4
+      if: ${{ matrix.sanitize == 'thread' }}
+      with:
+        key: sanitize-env
+        path: ${{ env.SANITIZE_THREAD_LIBS }}
+    - name: Run Tests
+      working-directory: ${{ github.workspace }}/build/test
+      env:
+        CK_TIMEOUT_MULTIPLIER: 5
+        ASAN_OPTIONS: detect_stack_use_after_return=1
+        TSAN_OPTIONS: suppressions=${{ github.workspace }}/.github/tsan-supressions.txt
+      run: |
+        case "${{ matrix.sanitize }}" in
+          *address*)
+            export LD_PRELOAD_SANITIZER="libasan.so.6" ;;
+          *thread*)
+            # As for now, not all tests pass with thread sanitizer enabled...
+            export XFAIL_TESTS="test-alsa-pcm test-utils-aplay"
+            export LD_LIBRARY_PATH="${{ env.SANITIZE_THREAD_LIBS }}:$LD_LIBRARY_PATH"
+            export LD_PRELOAD_SANITIZER="libtsan.so.0" ;;
+        esac
+        make check-TESTS
+    - name: Upload Tests Log
+      uses: actions/upload-artifact@v4
+      if: ${{ always() }}
+      with:
+        name: ${{ github.job }} (${{ matrix.sanitize }}) logs
+        path: ${{ github.workspace }}/build/test/*.log

@@ -1,0 +1,47 @@
+#!/bin/sh
+set -u
+
+log() {
+	printf '%s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$*"
+}
+
+# This VM owns only the Bluetooth adapter and its virtual sound/network devices.
+# Keeping all USB devices awake avoids controller-wide autosuspend stalls.
+echo -1 > /sys/module/usbcore/parameters/autosuspend 2>/dev/null || true
+echo N > /sys/module/btusb/parameters/enable_autosuspend 2>/dev/null || true
+for control in /sys/bus/usb/devices/*/power/control; do
+	echo on > "$control" 2>/dev/null || true
+done
+
+last_reconnect=0
+while :; do
+	if ! hciconfig hci0 >/dev/null 2>&1; then
+		sleep 5
+		continue
+	fi
+
+	bluetoothctl power on >/dev/null 2>&1 || true
+	hciconfig hci0 lp rswitch 2>/dev/null || true
+
+	paired=$(bluetoothctl devices Paired 2>/dev/null | awk '/^Device / { print $2 }')
+	for mac in $paired; do
+		bluetoothctl trust "$mac" >/dev/null 2>&1 || true
+	done
+
+	connected=$(hcitool con 2>/dev/null | awk '/ ACL / { print $3 }')
+	for mac in $connected; do
+		hcitool lp "$mac" rswitch 2>/dev/null || true
+	done
+
+	now=$(date +%s)
+	if [ -n "$paired" ] && [ -z "$connected" ] && [ $((now - last_reconnect)) -ge 30 ]; then
+		for mac in $paired; do
+			log "Reconnect attempt: $mac"
+			bluetoothctl connect "$mac" >/dev/null 2>&1 || true
+		done
+		last_reconnect=$now
+	fi
+
+	sleep 5
+done
+

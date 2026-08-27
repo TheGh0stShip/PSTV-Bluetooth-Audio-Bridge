@@ -1,0 +1,62 @@
+name: Bug report
+description: Report an installation, pairing, audio, or compatibility problem
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Run `Status.ps1 -Diagnostics` first. Never attach your private key or VMware memory files.
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version
+      placeholder: Windows 11 24H2
+    validations:
+      required: true
+  - type: input
+    id: vmware
+    attributes:
+      label: VMware Workstation version
+    validations:
+      required: true
+  - type: input
+    id: bluetooth
+    attributes:
+      label: Bluetooth adapter and VID/PID
+      placeholder: Intel 8087:0026
+    validations:
+      required: true
+  - type: input
+    id: firmware
+    attributes:
+      label: PSTV firmware and VitaBtFix version
+      placeholder: 3.65, VitaBtFix 1.1
+    validations:
+      required: true
+  - type: dropdown
+    id: network
+    attributes:
+      label: PC network connection
+      options:
+        - Ethernet
+        - 5/6 GHz Wi-Fi
+        - 2.4 GHz Wi-Fi
+        - Offline
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Include exact setup step, expected result, and actual result.
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Sanitized diagnostics
+      render: text
+    validations:
+      required: true
+

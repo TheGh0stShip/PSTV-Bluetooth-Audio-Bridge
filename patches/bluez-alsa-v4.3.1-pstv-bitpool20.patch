@@ -1,0 +1,14 @@
+diff --git a/src/a2dp-sbc.c b/src/a2dp-sbc.c
+index 433b1e7..5f1ea01 100644
+--- a/src/a2dp-sbc.c
++++ b/src/a2dp-sbc.c
+@@ -659,7 +659,7 @@ struct a2dp_sep a2dp_sbc_sink = {
+ 				SBC_ALLOCATION_SNR |
+ 				SBC_ALLOCATION_LOUDNESS,
+ 			.min_bitpool = SBC_MIN_BITPOOL,
+-			.max_bitpool = SBC_MAX_BITPOOL,
++			.max_bitpool = 20,
+ 		},
+ 	},
+ 	.configuration_select = a2dp_sbc_configuration_select,
+

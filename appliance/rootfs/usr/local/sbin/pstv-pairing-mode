@@ -1,0 +1,22 @@
+#!/bin/sh
+set -eu
+
+duration=${1:-300}
+case "$duration" in
+	*[!0-9]*|'') echo "Usage: pstv-pairing-mode [seconds]" >&2; exit 2 ;;
+esac
+
+bluetoothctl power on >/dev/null
+bluetoothctl pairable on >/dev/null
+bluetoothctl discoverable on >/dev/null
+hciconfig hci0 piscan 2>/dev/null || true
+
+if [ "$duration" -gt 0 ]; then
+	(
+		sleep "$duration"
+		bluetoothctl discoverable off >/dev/null 2>&1 || true
+	) >/dev/null 2>&1 &
+fi
+
+echo "PLT Focus is discoverable and pairable for ${duration} seconds."
+

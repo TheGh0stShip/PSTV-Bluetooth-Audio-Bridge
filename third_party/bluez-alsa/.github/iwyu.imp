@@ -1,0 +1,47 @@
+[
+
+	{ include: [ '<bits/getopt_core.h>', private, '<getopt.h>', public ] },
+	{ include: [ '<bits/types/struct_sched_param.h>', private, '<sched.h>', public ] },
+	{ include: [ '<bsd/libutil.h>', private, '<bsd/stdlib.h>', public ] },
+	{ include: [ '<bsd/sys/time.h>', private, '<sys/time.h>', public ] },
+	{ symbol: [ 'basename', private, '<libgen.h>', public ] },
+	{ symbol: [ 'sig_atomic_t', private, '<signal.h>', public ] },
+	{ symbol: [ 'S_IRWXU', private, '<sys/stat.h>', public ] },
+
+	{ include: [ '<alsa/conf.h>', private, '<alsa/asoundlib.h>', public ] },
+	{ include: [ '<alsa/control.h>', private, '<alsa/asoundlib.h>', public ] },
+	{ include: [ '<alsa/error.h>', private, '<alsa/asoundlib.h>', public ] },
+	{ include: [ '<alsa/global.h>', private, '<alsa/asoundlib.h>', public ] },
+	{ include: [ '<alsa/input.h>', private, '<alsa/asoundlib.h>', public ] },
+	{ include: [ '<alsa/mixer.h>', private, '<alsa/asoundlib.h>', public ] },
+	{ include: [ '<alsa/output.h>', private, '<alsa/asoundlib.h>', public ] },
+	{ include: [ '<alsa/pcm.h>', private, '<alsa/asoundlib.h>', public ] },
+	{ include: [ '<alsa/pcm_ioplug.h>', private, '<alsa/pcm_external.h>', public ] },
+	{ include: [ '<alsa/seq.h>', private, '<alsa/asoundlib.h>', public ] },
+	{ include: [ '<alsa/seq_event.h>', private, '<alsa/asoundlib.h>', public ] },
+	{ include: [ '<alsa/seq_midi_event.h>', private, '<alsa/asoundlib.h>', public ] },
+	{ include: [ '<alsa/seqmid.h>', private, '<alsa/asoundlib.h>', public ] },
+	{ include: [ '<alsa/version.h>', private, '<alsa/asoundlib.h>', public ] },
+
+	{ include: [ '"dbus/dbus-memory.h"', private, '<dbus/dbus.h>', public ] },
+	{ include: [ '"dbus/dbus-protocol.h"', private, '<dbus/dbus.h>', public ] },
+	{ include: [ '"dbus/dbus-shared.h"', private, '<dbus/dbus.h>', public ] },
+
+	{ include: [ '<glib/gtypes.h>', private, '<glib.h>', public ] },
+	{ include: [ '"gobject/gclosure.h"', private, '<glib-object.h>', public ] },
+	{ include: [ '"gio/gdbusinterfaceskeleton.h"', private, '<gio/gio.h>', public ] },
+	{ include: [ '"gio/gdbusobjectmanager.h"', private, '<gio/gio.h>', public ] },
+	{ include: [ '"gio/gdbusobjectmanagerserver.h"', private, '<gio/gio.h>', public ] },
+	{ include: [ '"gio/gdbusobjectskeleton.h"', private, '<gio/gio.h>', public ] },
+
+	{ include: [ '<fdk-aac/FDK_audio.h>', private, '<fdk-aac/aacenc_lib.h>', public ] },
+
+	{ include: [ '<lc3_private.h>', private, '<lc3.h>', public ] },
+
+	{ include: [ '<fmt123.h>', private, '<mpg123.h>', public ] },
+
+	{ include: [ '"opus_defines.h"', private, '<opus.h>', public ] },
+
+	{ include: [ '<spandsp/plc.h>', private, '<spandsp.h>', public ] },
+
+]

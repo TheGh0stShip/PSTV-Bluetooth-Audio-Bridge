@@ -1,0 +1,6 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Setup and troubleshooting guide
+    url: https://github.com/TheGh0stShip/PSTV-Bluetooth-Audio-Bridge/blob/main/docs/TROUBLESHOOTING.md
+    about: Check known fixes before opening an issue.
+

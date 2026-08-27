@@ -1,0 +1,36 @@
+# Build products and caches
+/.cache/
+/.work/
+/out/
+
+# Generated installation state
+/config/
+/logs/
+*.btsnoop
+
+# VMware runtime/private state
+*.lck/
+*.lck
+*.log
+*.nvram
+*.scoreboard
+*.vmem
+*.vmss
+*.vmsd
+*.vmxf
+vmware-*.log
+
+# Keys and credentials
+id_ed25519
+id_ed25519.pub
+known_hosts
+admin-password.txt
+hostkey.txt
+*.token
+*.secret
+
+# Editor/OS files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
