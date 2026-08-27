@@ -1,8 +1,8 @@
 # PSTV Bluetooth Audio Bridge
 
-Route PlayStation TV system and game audio to the current Windows playback device over Bluetooth—without an analog capture cable.
+Route PlayStation TV system and game audio to Windows over Bluetooth—without an analog capture cable.
 
-This project packages the working solution as a small Alpine Linux appliance for VMware Workstation. The VM presents itself to the PSTV as a `PLT Focus` Bluetooth headset, receives SBC/A2DP audio, and plays it through VMware's virtual sound card into Windows.
+The bridge is a small Alpine Linux appliance for VMware Workstation. It appears to the PSTV as a `PLT Focus` headset, receives SBC/A2DP audio, and plays it through the Windows default output.
 
 ```mermaid
 flowchart LR
@@ -27,12 +27,15 @@ flowchart LR
 
 ## Requirements
 
-- A homebrew-enabled PlayStation TV.
-- Windows 10 or Windows 11 on an x86-64 PC.
-- [VMware Workstation Pro 17.5.2 or newer](https://knowledge.broadcom.com/external/article/368667/download-and-license-vmware-desktop-hype.html). Broadcom currently provides supported versions free for personal, educational, and commercial use.
-- An existing Bluetooth radio exposed internally over USB, or a USB Bluetooth dongle, supported by Linux. A dedicated dongle is recommended; the Bluetooth portion of an internal combo radio can also work but becomes unavailable to Windows while the bridge runs.
-- VitaBtFix 1.1 installed on the PSTV.
-- Ethernet or 5 GHz Wi-Fi is strongly recommended. The PSTV and Bluetooth both use 2.4 GHz, where contention can cause stalls.
+| Requirement | Details |
+| --- | --- |
+| PlayStation TV | Homebrew-enabled and able to load VitaBtFix 1.1. |
+| Windows PC | Windows 10 or 11 on x86-64. |
+| VMware | [Workstation Pro 17.5.2 or newer](https://knowledge.broadcom.com/external/article/368667/download-and-license-vmware-desktop-hype.html). |
+| Bluetooth | A Linux-supported built-in USB-attached radio or external USB dongle. A dedicated dongle is recommended. |
+| Network | Ethernet, 5 GHz Wi-Fi, or 6 GHz Wi-Fi is preferred. Wi-Fi remains enabled during setup and use. |
+
+While the bridge runs, Windows cannot use Bluetooth devices attached through the dedicated radio. The Wi-Fi portion of an internal combo adapter remains available.
 
 Tested end-to-end with an Intel `8087:0026` Bluetooth controller, VMware USB 2.0 passthrough, PSTV firmware 3.65, VitaBtFix 1.1, Alpine 3.24, and BlueALSA 4.3.1.
 
@@ -50,19 +53,23 @@ See [Quick Start](docs/QUICKSTART.md) for the complete walkthrough.
 
 ## Everyday use
 
-The bridge starts automatically 15 seconds after Windows logon. The Bluetooth adapter is owned by the VM while it runs, so Windows Bluetooth devices using that same radio will be unavailable. A paired PSTV reconnects automatically after reboot, normally within 30 seconds.
+The bridge starts 15 seconds after Windows logon. A paired PSTV normally reconnects within 30 seconds after reboot.
 
-- `Status.ps1` — show connection and service health.
-- `Status.ps1 -Diagnostics` — collect detailed live diagnostics.
-- `Pair-PSTV.ps1` — reopen pairing mode.
-- `Set-LatencyProfile.ps1` — switch among the default UltraLow (30/10 ms), LowLatency (60/20 ms), and Stable (200/50 ms) playback buffering.
-- `Stop-Bridge.ps1` — stop the VM and return the Bluetooth radio to Windows.
-- `Start-Bridge.ps1` — start it again.
-- `Uninstall.ps1` — remove autostart and stop the appliance; generated pairing state is retained unless explicitly removed.
+| Command | Purpose |
+| --- | --- |
+| `Status.ps1` | Show connection and service health. |
+| `Status.ps1 -Diagnostics` | Collect detailed diagnostics. |
+| `Pair-PSTV.ps1` | Reopen pairing mode. |
+| `Set-LatencyProfile.ps1` | Select UltraLow, LowLatency, or Stable buffering. |
+| `Stop-Bridge.ps1` | Stop the VM and return the Bluetooth radio to Windows. |
+| `Start-Bridge.ps1` | Start the bridge again. |
+| `Uninstall.ps1` | Remove autostart and stop the appliance. |
 
 ## Why the custom BlueALSA build?
 
-The PSTV originally negotiated SBC bitpool 51, which consumed too much reliable airtime in the tested VMware Bluetooth path. This appliance keeps BlueALSA 4.3.1's normal source capability intact but caps only the A2DP sink capability at bitpool 20. Combined with VitaBtFix's RTP timestamp correction, USB autosuspend suppression, USB 2.0 passthrough, and disabled sniff mode, the tested stream delivered 2,783 consecutive packets with zero missing packets.
+- **Problem:** the PSTV negotiated SBC bitpool 51, which consumed too much reliable airtime in the tested VMware Bluetooth path.
+- **Change:** the appliance keeps BlueALSA 4.3.1's normal source capability but caps its A2DP sink capability at bitpool 20.
+- **Result:** with VitaBtFix, USB autosuspend suppression, USB 2.0 passthrough, and disabled sniff mode, the test stream delivered 2,783 consecutive packets with zero missing packets.
 
 Details are in [Architecture](docs/ARCHITECTURE.md).
 

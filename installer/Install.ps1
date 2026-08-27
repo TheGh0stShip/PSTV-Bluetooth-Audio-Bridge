@@ -6,7 +6,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version 2.0
-$releaseVersion = '1.1.0'
+$releaseVersion = '1.1.1'
 $taskName = 'PSTV Bluetooth Audio Bridge'
 $root = $PSScriptRoot
 $vmx = Join-Path $root 'vm\PSTV-Bluetooth-Audio-Bridge.vmx'

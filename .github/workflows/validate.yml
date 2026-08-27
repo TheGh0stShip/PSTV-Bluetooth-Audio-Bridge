@@ -31,6 +31,17 @@ jobs:
             echo 'Setup/start scripts must never disable Wi-Fi.' >&2
             exit 1
           fi
+      - name: Check user-facing release text
+        run: |
+          version=$(sed -n "s/^\$releaseVersion = '\([^']*\)'/\1/p" installer/Install.ps1)
+          test -n "$version"
+          test -f ".github/release-notes/v${version}.md"
+          if grep -R -n -F '\n' .github/release-notes; then
+            echo 'Release notes contain a literal newline escape.' >&2
+            exit 1
+          fi
+          grep -q '^## Quick install$' ".github/release-notes/v${version}.md"
+          grep -q '^## Requirements$' ".github/release-notes/v${version}.md"
 
   powershell:
     runs-on: windows-latest

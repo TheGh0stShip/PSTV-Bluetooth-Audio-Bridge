@@ -43,10 +43,12 @@ out/vm/PSTV-Bluetooth-Audio-Bridge.vmdk
 ## Create a release bundle
 
 ```powershell
-.\build\New-Release.ps1 -Version 1.1.0
+.\build\New-Release.ps1 -Version 1.1.1
 ```
 
 The packager rejects VM runtime state, logs, host-key files, and management credentials. It creates a per-file manifest inside the bundle and a SHA-256 file alongside the final ZIP.
+
+Publish GitHub release notes from a Markdown file with `gh release create --notes-file`. Do not pass escaped newlines through a command-line string; PowerShell does not translate `\n` into line breaks.
 
 ## Verify the source delta
 

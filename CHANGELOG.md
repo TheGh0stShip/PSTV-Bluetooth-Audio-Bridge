@@ -4,6 +4,15 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/en/1.1.
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-08-27
+
+### Fixed
+
+- Render GitHub release notes with real Markdown headings, lists, and line breaks.
+- Correct stale Architecture text about the default latency profile and Wi-Fi behavior.
+- Restructure the README and setup guides for faster scanning.
+- Remove duplicate Wi-Fi troubleshooting advice.
+
 ## [1.1.0] - 2026-08-26
 
 ### Added

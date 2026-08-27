@@ -33,7 +33,9 @@ The two hashes must match. Extract the complete archive to a non-system drive. D
 
 ## 4. Run setup
 
-Double-click `SETUP.cmd` and approve the Windows administrator prompt. The same setup can be launched manually with `Install.ps1` if command-line adapter selection is needed.
+Double-click `SETUP.cmd` and approve the Windows administrator prompt.
+
+For command-line adapter selection, run `Install.ps1` instead.
 
 Setup will:
 
@@ -57,9 +59,9 @@ When setup displays the pairing prompt:
 3. Select **PLT Focus**.
 4. Accept the pairing request if shown.
 
-Setup detects the paired console automatically. The unique Bluetooth link key is created between that PSTV and that installed VM, then retained inside the appliance for future reconnects.
+Setup detects the paired console automatically. The PSTV and appliance create and retain their own Bluetooth link key; you do not need to copy or enter one.
 
-No pairing key needs to be copied or entered. After later PSTV reboots, the appliance retries the trusted connection automatically and normally restores audio within 30 seconds.
+After later PSTV reboots, the appliance retries the trusted connection automatically. Audio normally returns within 30 seconds.
 
 ## 6. Play audio
 
@@ -72,12 +74,27 @@ If you change the Windows default output and VMware does not follow it, run:
 .\Start-Bridge.ps1
 ```
 
+## Latency profiles
+
+| Profile | Guest buffer/period | Use when |
+| --- | --- | --- |
+| UltraLow (default) | 30/10 ms | The adapter and host can sustain the smallest tested queue. |
+| LowLatency | 60/20 ms | UltraLow produces occasional underruns or gaps. |
+| Stable | 200/50 ms | Reliability matters more than delay on a difficult host. |
+
+Change profiles from PowerShell:
+
+```powershell
+.\Set-LatencyProfile.ps1 -Profile LowLatency
+```
+
+VMware adds an approximately 53 ms host queue even in UltraLow mode. A2DP also introduces codec and radio latency.
+
 ## Important behavior
 
 - Windows temporarily loses access to the dedicated Bluetooth radio while the VM is running. This is expected.
 - Do not dedicate the only adapter used by a Bluetooth keyboard or mouse. Use a separate USB Bluetooth dongle for the bridge.
 - The first boot can take up to three minutes. Later boots are much faster.
-- A2DP has inherent codec and radio latency. The bridge defaults to the tested UltraLow profile with 30/10 ms guest buffering and VMware's approximately 53 ms minimum practical host queue. Run `Set-LatencyProfile.ps1 -Profile LowLatency` or `-Profile Stable` if a particular adapter needs more dropout tolerance.
 - USB 3 devices/cables and 2.4 GHz Wi-Fi near the Bluetooth antenna can create severe interference.
 
 ## Check health

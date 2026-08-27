@@ -24,7 +24,13 @@ For firmware 3.60–3.62:
 .\Install-VitaBtFix.ps1 -VitaIp 192.168.1.50 -Firmware360
 ```
 
-The helper downloads `ur0:tai/config.txt`, makes a timestamped local backup, uploads `ur0:tai/config.txt.pstv-bridge.bak`, uploads the plugin, and inserts its entry immediately below `*KERNEL`. It refuses to upload a modified config if the `*KERNEL` section is missing.
+The helper:
+
+- Downloads `ur0:tai/config.txt` and creates a timestamped local backup.
+- Uploads an on-console backup as `ur0:tai/config.txt.pstv-bridge.bak`.
+- Uploads the correct plugin as `ur0:tai/vitabtfix.skprx`.
+- Inserts the plugin entry immediately below `*KERNEL`.
+- Refuses to change anything if the `*KERNEL` section is missing.
 
 Stop VitaShell FTP and reboot the PSTV afterward.
 
@@ -49,4 +55,3 @@ After reboot, check `ux0:data/vitabtfix/log.txt`. A successful installation cont
 If the PSTV has trouble booting, hold **L** while it boots to skip kernel plugins. Then remove or rename `ur0:tai/vitabtfix.skprx` and remove its config entry.
 
 Upstream source and releases: [gabew100/VitaBtFix](https://github.com/gabew100/VitaBtFix)
-
