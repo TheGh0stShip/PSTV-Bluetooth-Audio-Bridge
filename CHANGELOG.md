@@ -2,6 +2,13 @@
 
 All notable changes follow [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow semantic versioning.
 
+## [Unreleased]
+
+### Changed
+
+- Request VMware's minimum practical host audio queue (about 53 ms instead of 200 ms).
+- Add a 30/10 ms UltraLow profile and run the playback worker at modest real-time priority.
+
 ## [1.0.0] - 2026-08-26
 
 ### Added

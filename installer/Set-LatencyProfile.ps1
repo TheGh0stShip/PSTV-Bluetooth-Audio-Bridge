@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [ValidateSet('LowLatency', 'Stable')]
+    [ValidateSet('UltraLow', 'LowLatency', 'Stable')]
     [string]$Profile = 'LowLatency'
 )
 
@@ -12,7 +12,11 @@ $root = $PSScriptRoot
 $address = Find-BridgeAddress
 if (-not $address) { throw 'Could not locate the provisioned appliance. Run Install.ps1 first.' }
 
-if ($Profile -eq 'LowLatency') {
+if ($Profile -eq 'UltraLow') {
+    $buffer = '30000'
+    $period = '10000'
+}
+elseif ($Profile -eq 'LowLatency') {
     $buffer = '60000'
     $period = '20000'
 }

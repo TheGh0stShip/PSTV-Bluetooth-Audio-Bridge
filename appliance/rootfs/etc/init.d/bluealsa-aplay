@@ -1,8 +1,8 @@
 #!/sbin/openrc-run
 
 name="PSTV audio output"
-command="/usr/bin/bluealsa-aplay"
-command_args="-S -vv -D default --pcm-buffer-time=60000 --pcm-period-time=20000 --single-audio --profile-a2dp"
+command="/usr/bin/chrt"
+command_args="-f 20 /usr/bin/bluealsa-aplay -S -vv -D default --pcm-buffer-time=60000 --pcm-period-time=20000 --single-audio --profile-a2dp"
 command_background="yes"
 pidfile="/run/bluealsa-aplay.pid"
 output_log="/var/log/bluealsa-aplay.log"

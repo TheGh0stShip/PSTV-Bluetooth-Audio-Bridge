@@ -53,7 +53,7 @@ The bridge starts automatically 15 seconds after Windows logon. The Bluetooth ad
 - `Status.ps1` — show connection and service health.
 - `Status.ps1 -Diagnostics` — collect detailed live diagnostics.
 - `Pair-PSTV.ps1` — reopen pairing mode.
-- `Set-LatencyProfile.ps1` — switch between low-latency and extra-stable playback buffering.
+- `Set-LatencyProfile.ps1` — switch among UltraLow (30/10 ms), LowLatency (60/20 ms), and Stable (200/50 ms) playback buffering.
 - `Stop-Bridge.ps1` — stop the VM and return the Bluetooth radio to Windows.
 - `Start-Bridge.ps1` — start it again.
 - `Uninstall.ps1` — remove autostart, stop the appliance, and restore Wi-Fi adapters changed by setup.

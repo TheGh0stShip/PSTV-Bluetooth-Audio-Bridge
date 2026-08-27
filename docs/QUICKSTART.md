@@ -75,7 +75,7 @@ If you change the Windows default output and VMware does not follow it, run:
 - Windows temporarily loses access to the dedicated Bluetooth radio while the VM is running. This is expected.
 - Do not dedicate the only adapter used by a Bluetooth keyboard or mouse. Use a separate USB Bluetooth dongle for the bridge.
 - The first boot can take up to three minutes. Later boots are much faster.
-- A2DP has inherent codec and radio latency. The bridge defaults to a low-latency 60/20 ms playback profile; `Set-LatencyProfile.ps1 -Profile Stable` trades more delay for additional dropout tolerance.
+- A2DP has inherent codec and radio latency. The bridge defaults to a low-latency 60/20 ms playback profile. Run `Set-LatencyProfile.ps1 -Profile UltraLow` for 30/10 ms guest buffering, or `-Profile Stable` to trade more delay for additional dropout tolerance.
 - USB 3 devices/cables and 2.4 GHz Wi-Fi near the Bluetooth antenna can create severe interference.
 
 ## Check health

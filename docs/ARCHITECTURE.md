@@ -26,6 +26,8 @@ The working configuration combines several independent fixes:
 - **No Bluetooth sniff mode:** allows role switch but prevents the audio ACL link from entering a low-duty-cycle power mode.
 - **High host VM priority:** reduces scheduling jitter.
 - **60 ms/20 ms low-latency ALSA buffer/period:** keeps exactly three periods, BlueALSA's documented reliability minimum, while removing most bridge-side queuing. An optional 200/50 ms stable profile absorbs greater host scheduling variance.
+- **Reduced VMware host queue:** `sound.bufferTime=10` and `sound.numBuffers=3` request the smallest practical Workstation buffer. Workstation 17 clamps this to five 10.67 ms buffers (about 53 ms), down from its 200 ms default.
+- **UltraLow option:** 30/10 ms guest buffering is available for hosts that can sustain it; the player runs at modest FIFO priority 20 to reduce scheduler jitter.
 - **Wi-Fi coexistence control:** disconnected Wi-Fi radios are disabled by setup to prevent background 2.4 GHz scanning.
 
 The final development capture after these changes contained 2,783 consecutive audio packets, zero missing RTP packets, no interval above 100 ms, and a 69 ms maximum interval.

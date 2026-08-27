@@ -36,6 +36,10 @@ sound.startConnected = "TRUE"
 sound.autoDetect = "TRUE"
 sound.fileName = "-1"
 sound.virtualDev = "hdaudio"
+# VMware clamps these requests to five 10.67 ms host buffers on Workstation 17.
+# That is ~53 ms total instead of the 200 ms default host audio queue.
+sound.bufferTime = "10"
+sound.numBuffers = "3"
 
 usb.present = "TRUE"
 ehci.present = "TRUE"
