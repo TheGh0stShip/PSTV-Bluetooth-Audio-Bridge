@@ -16,6 +16,8 @@ bluealsa=stopped
 rc-service bluealsa status >/dev/null 2>&1 && bluealsa=started
 player=stopped
 rc-service bluealsa-aplay status >/dev/null 2>&1 && player=started
+reconnect=stopped
+rc-service pstv-bridge status >/dev/null 2>&1 && reconnect=started
 pcm=idle
 bluealsa-cli list-pcms 2>/dev/null | grep -q . && pcm=ready
 
@@ -24,5 +26,5 @@ echo "paired=${paired:-none}"
 echo "connected=${connected:-none}"
 echo "bluealsa=$bluealsa"
 echo "player=$player"
+echo "reconnect=$reconnect"
 echo "pcm=$pcm"
-

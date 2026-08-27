@@ -4,7 +4,6 @@ param()
 $ErrorActionPreference = 'Stop'
 $root = $PSScriptRoot
 $vmx = Join-Path $root 'vm\PSTV-Bluetooth-Audio-Bridge.vmx'
-$configPath = Join-Path $root 'config\install.json'
 $logDir = Join-Path $root 'logs'
 $logPath = Join-Path $logDir 'host.log'
 New-Item -ItemType Directory -Force -Path $logDir | Out-Null
@@ -25,17 +24,6 @@ if (-not $vmrun) {
 }
 if (-not (Test-Path -LiteralPath $vmx)) {
     throw "Appliance VM is missing: $vmx"
-}
-
-if (Test-Path -LiteralPath $configPath) {
-    $config = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json
-    foreach ($adapterName in @($config.disabledWiFiAdapters)) {
-        $adapter = Get-NetAdapter -Name $adapterName -ErrorAction SilentlyContinue
-        if ($adapter -and $adapter.Status -ne 'Disabled') {
-            Disable-NetAdapter -Name $adapterName -Confirm:$false
-            Write-BridgeLog "Disabled the configured Wi-Fi adapter '$adapterName' to protect Bluetooth airtime."
-        }
-    }
 }
 
 $resolvedVmx = (Resolve-Path -LiteralPath $vmx).Path
@@ -68,4 +56,3 @@ do {
     }
     Start-Sleep -Milliseconds 500
 } while ((Get-Date) -lt $deadline)
-

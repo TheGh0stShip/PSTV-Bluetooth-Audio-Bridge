@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [ValidateSet('UltraLow', 'LowLatency', 'Stable')]
-    [string]$Profile = 'LowLatency'
+    [string]$Profile = 'UltraLow'
 )
 
 $ErrorActionPreference = 'Stop'

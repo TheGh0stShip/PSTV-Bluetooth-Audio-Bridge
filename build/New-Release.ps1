@@ -1,5 +1,5 @@
 [CmdletBinding()]
-param([string]$Version = '1.0.0')
+param([string]$Version = '1.1.0')
 
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
@@ -19,6 +19,7 @@ New-Item -ItemType Directory -Force -Path $bundle,(Join-Path $bundle 'vm'),(Join
 Copy-Item -LiteralPath (Join-Path $repoRoot 'README.md'),(Join-Path $repoRoot 'LICENSE'),(Join-Path $repoRoot 'THIRD_PARTY_NOTICES.md') -Destination $bundle
 Copy-Item -LiteralPath (Join-Path $repoRoot 'docs') -Destination $bundle -Recurse
 Copy-Item -Path (Join-Path $repoRoot 'installer\*.ps1') -Destination $bundle
+Copy-Item -LiteralPath (Join-Path $repoRoot 'SETUP.cmd') -Destination $bundle
 Copy-Item -LiteralPath (Join-Path $vmSource 'PSTV-Bluetooth-Audio-Bridge.vmx'),(Join-Path $vmSource 'PSTV-Bluetooth-Audio-Bridge.vmdk') -Destination (Join-Path $bundle 'vm')
 Copy-Item -LiteralPath (Join-Path $repoRoot 'vita\vitabtfix.skprx'),(Join-Path $repoRoot 'vita\vitabtfix-3.60.skprx') -Destination (Join-Path $bundle 'vita')
 Copy-Item -LiteralPath (Join-Path $repoRoot 'tools\plink.exe'),(Join-Path $repoRoot 'tools\PUTTY-LICENSE.html') -Destination (Join-Path $bundle 'tools')

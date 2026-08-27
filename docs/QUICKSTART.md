@@ -33,7 +33,7 @@ The two hashes must match. Extract the complete archive to a non-system drive. D
 
 ## 4. Run setup
 
-Right-click `Install.ps1`, select **Run with PowerShell**, and approve elevation.
+Double-click `SETUP.cmd` and approve the Windows administrator prompt. The same setup can be launched manually with `Install.ps1` if command-line adapter selection is needed.
 
 Setup will:
 
@@ -41,7 +41,7 @@ Setup will:
 2. Ask which radio to dedicate if more than one is present.
 3. Generate a unique 256-bit management credential under `config\`; setup uses it automatically.
 4. Configure stable USB 2.0 passthrough in the bundled VM.
-5. Disable only disconnected Wi-Fi adapters, which prevents background 2.4 GHz scans. Active Wi-Fi is left alone unless setup is run with `-DisableActiveWiFi`.
+5. Leave every Windows Wi-Fi adapter enabled and unchanged.
 6. Register the bridge to start for the current Windows user at logon.
 7. Boot and securely provision the appliance.
 8. Wait for PSTV pairing.
@@ -59,6 +59,8 @@ When setup displays the pairing prompt:
 
 Setup detects the paired console automatically. The unique Bluetooth link key is created between that PSTV and that installed VM, then retained inside the appliance for future reconnects.
 
+No pairing key needs to be copied or entered. After later PSTV reboots, the appliance retries the trusted connection automatically and normally restores audio within 30 seconds.
+
 ## 6. Play audio
 
 Start a game or move through a menu that produces sound. The audio goes to the Windows playback device that VMware is using. For the most predictable result, select the desired Windows default output before the bridge starts.
@@ -75,7 +77,7 @@ If you change the Windows default output and VMware does not follow it, run:
 - Windows temporarily loses access to the dedicated Bluetooth radio while the VM is running. This is expected.
 - Do not dedicate the only adapter used by a Bluetooth keyboard or mouse. Use a separate USB Bluetooth dongle for the bridge.
 - The first boot can take up to three minutes. Later boots are much faster.
-- A2DP has inherent codec and radio latency. The bridge defaults to a low-latency 60/20 ms playback profile. Run `Set-LatencyProfile.ps1 -Profile UltraLow` for 30/10 ms guest buffering, or `-Profile Stable` to trade more delay for additional dropout tolerance.
+- A2DP has inherent codec and radio latency. The bridge defaults to the tested UltraLow profile with 30/10 ms guest buffering and VMware's approximately 53 ms minimum practical host queue. Run `Set-LatencyProfile.ps1 -Profile LowLatency` or `-Profile Stable` if a particular adapter needs more dropout tolerance.
 - USB 3 devices/cables and 2.4 GHz Wi-Fi near the Bluetooth antenna can create severe interference.
 
 ## Check health
@@ -84,4 +86,4 @@ If you change the Windows default output and VMware does not follow it, run:
 .\Status.ps1
 ```
 
-A healthy running bridge reports an adapter, started services, the paired/connected PSTV, and a ready PCM when the PSTV is actively producing audio.
+A healthy running bridge reports an adapter, `bluealsa=started`, `player=started`, `reconnect=started`, the paired/connected PSTV, and a ready PCM when the PSTV is actively producing audio.

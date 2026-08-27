@@ -1,13 +1,12 @@
 [CmdletBinding()]
 param(
     [string]$BluetoothHardwareId,
-    [switch]$DisableActiveWiFi,
     [switch]$SkipPairing
 )
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version 2.0
-$releaseVersion = '1.0.0'
+$releaseVersion = '1.1.0'
 $taskName = 'PSTV Bluetooth Audio Bridge'
 $root = $PSScriptRoot
 $vmx = Join-Path $root 'vm\PSTV-Bluetooth-Audio-Bridge.vmx'
@@ -27,10 +26,9 @@ function Test-Administrator {
 if (-not (Test-Administrator)) {
     $arguments = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', ('"{0}"' -f $PSCommandPath))
     if ($BluetoothHardwareId) { $arguments += @('-BluetoothHardwareId', ('"{0}"' -f $BluetoothHardwareId)) }
-    if ($DisableActiveWiFi) { $arguments += '-DisableActiveWiFi' }
     if ($SkipPairing) { $arguments += '-SkipPairing' }
-    Start-Process -FilePath 'powershell.exe' -ArgumentList ($arguments -join ' ') -Verb RunAs
-    return
+    $elevated = Start-Process -FilePath 'powershell.exe' -ArgumentList ($arguments -join ' ') -Verb RunAs -Wait -PassThru
+    exit $elevated.ExitCode
 }
 
 function Find-Vmrun {
@@ -120,19 +118,12 @@ Set-VmxProperty -Path $vmx -Name 'usb.autoConnect.device0' -Value ("vid:{0} pid:
 Set-VmxProperty -Path $vmx -Name 'guestinfo.pstv_admin_password' -Value $encodedPassword
 Set-VmxProperty -Path $vmx -Name 'guestinfo.pstv_release' -Value $releaseVersion
 
-$disabledWiFi = [Collections.Generic.List[string]]::new()
 $wifiAdapters = @(Get-NetAdapter -Physical -ErrorAction SilentlyContinue | Where-Object {
     $_.InterfaceDescription -match 'Wi-Fi|Wireless|802\.11' -or $_.Name -match 'Wi-?Fi|Wireless'
 })
 foreach ($wifi in $wifiAdapters) {
-    $shouldDisable = $wifi.Status -eq 'Disconnected' -or $wifi.Status -eq 'Not Present' -or $DisableActiveWiFi
-    if ($shouldDisable -and $wifi.Status -ne 'Disabled') {
-        Disable-NetAdapter -Name $wifi.Name -Confirm:$false
-        $disabledWiFi.Add($wifi.Name)
-        Write-Host "Disabled Wi-Fi adapter '$($wifi.Name)' to prevent 2.4 GHz coexistence stalls." -ForegroundColor Yellow
-    }
-    elseif ($wifi.Status -eq 'Up') {
-        Write-Warning "Wi-Fi adapter '$($wifi.Name)' is active. Prefer Ethernet/5 GHz or a dedicated USB Bluetooth adapter if audio skips."
+    if ($wifi.Status -eq 'Up') {
+        Write-Host "Wi-Fi adapter '$($wifi.Name)' remains enabled." -ForegroundColor Green
     }
 }
 
@@ -143,7 +134,7 @@ $config = [ordered]@{
     bluetoothHardwareId  = $radio.HardwareId
     bluetoothVid         = $radio.Vid
     bluetoothPid         = $radio.Pid
-    disabledWiFiAdapters = @($disabledWiFi)
+    disabledWiFiAdapters = @()
 }
 $config | ConvertTo-Json | Set-Content -LiteralPath $configPath -Encoding UTF8
 
@@ -194,4 +185,5 @@ if (-not $SkipPairing) {
 Write-Host ''
 Write-Host 'Installation complete.' -ForegroundColor Green
 Write-Host 'The bridge starts automatically at logon and sends PSTV audio to the current Windows default output.'
+Write-Host 'After a PSTV reboot, the appliance reconnects automatically (normally within 30 seconds).'
 Write-Host 'Run Status.ps1 for health checks or Pair-PSTV.ps1 to pair later.'

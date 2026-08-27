@@ -20,6 +20,17 @@ jobs:
           find appliance/rootfs/usr/local/sbin -type f -print0 | xargs -0 shellcheck
           # OpenRC service variables are consumed by openrc-run, not this file.
           find appliance/rootfs/etc/init.d -type f -print0 | xargs -0 shellcheck -s sh -e SC2034
+      - name: Check final appliance defaults
+        run: |
+          test -f SETUP.cmd
+          grep -F 'pstv-bridge' build/build-appliance.sh
+          grep -F -- '--pcm-buffer-time=30000 --pcm-period-time=10000' appliance/rootfs/etc/init.d/bluealsa-aplay
+          grep -F 'sound.bufferTime = "10"' appliance/PSTV-Bluetooth-Audio-Bridge.vmx
+          grep -F "Join-Path \$repoRoot 'SETUP.cmd'" build/New-Release.ps1
+          if grep -R -F 'Disable-NetAdapter' installer; then
+            echo 'Setup/start scripts must never disable Wi-Fi.' >&2
+            exit 1
+          fi
 
   powershell:
     runs-on: windows-latest

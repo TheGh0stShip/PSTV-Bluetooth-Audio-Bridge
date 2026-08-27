@@ -19,8 +19,10 @@ flowchart LR
 - Configures stable VMware USB 2.0 passthrough.
 - Starts a clean, preconfigured Alpine VM and provisions it over DHCP.
 - Advertises the receiver as `PLT Focus` and detects PSTV pairing automatically.
+- Reconnects the paired PSTV automatically after either the console or appliance restarts.
 - Installs per-user Windows logon autostart.
 - Routes audio to the Windows default output through VMware.
+- Leaves every Windows Wi-Fi adapter enabled and unchanged.
 - Includes the official VitaBtFix 1.1 plugin and a backed-up FTP installer helper.
 
 ## Requirements
@@ -28,7 +30,7 @@ flowchart LR
 - A homebrew-enabled PlayStation TV.
 - Windows 10 or Windows 11 on an x86-64 PC.
 - [VMware Workstation Pro 17.5.2 or newer](https://knowledge.broadcom.com/external/article/368667/download-and-license-vmware-desktop-hype.html). Broadcom currently provides supported versions free for personal, educational, and commercial use.
-- A USB-attached Bluetooth radio supported by Linux. A dedicated USB adapter is recommended; an internal Intel combo radio also works but becomes unavailable to Windows while the bridge runs.
+- An existing Bluetooth radio exposed internally over USB, or a USB Bluetooth dongle, supported by Linux. A dedicated dongle is recommended; the Bluetooth portion of an internal combo radio can also work but becomes unavailable to Windows while the bridge runs.
 - VitaBtFix 1.1 installed on the PSTV.
 - Ethernet or 5 GHz Wi-Fi is strongly recommended. The PSTV and Bluetooth both use 2.4 GHz, where contention can cause stalls.
 
@@ -40,7 +42,7 @@ Tested end-to-end with an Intel `8087:0026` Bluetooth controller, VMware USB 2.0
 2. Verify the archive using the adjacent `SHA256SUMS.txt`.
 3. Extract the entire folder to a non-system drive with at least 2 GB free.
 4. Install VitaBtFix using [the PSTV preparation guide](docs/VITA_SETUP.md).
-5. Right-click `Install.ps1` and choose **Run with PowerShell**. Approve the administrator prompt.
+5. Double-click `SETUP.cmd` and approve the administrator prompt.
 6. On the PSTV, open **Settings → Devices → Bluetooth Devices**, then select **PLT Focus**.
 7. Play anything. Audio follows the Windows default playback device.
 
@@ -48,15 +50,15 @@ See [Quick Start](docs/QUICKSTART.md) for the complete walkthrough.
 
 ## Everyday use
 
-The bridge starts automatically 15 seconds after Windows logon. The Bluetooth adapter is owned by the VM while it runs, so Windows Bluetooth devices using that same radio will be unavailable.
+The bridge starts automatically 15 seconds after Windows logon. The Bluetooth adapter is owned by the VM while it runs, so Windows Bluetooth devices using that same radio will be unavailable. A paired PSTV reconnects automatically after reboot, normally within 30 seconds.
 
 - `Status.ps1` — show connection and service health.
 - `Status.ps1 -Diagnostics` — collect detailed live diagnostics.
 - `Pair-PSTV.ps1` — reopen pairing mode.
-- `Set-LatencyProfile.ps1` — switch among UltraLow (30/10 ms), LowLatency (60/20 ms), and Stable (200/50 ms) playback buffering.
+- `Set-LatencyProfile.ps1` — switch among the default UltraLow (30/10 ms), LowLatency (60/20 ms), and Stable (200/50 ms) playback buffering.
 - `Stop-Bridge.ps1` — stop the VM and return the Bluetooth radio to Windows.
 - `Start-Bridge.ps1` — start it again.
-- `Uninstall.ps1` — remove autostart, stop the appliance, and restore Wi-Fi adapters changed by setup.
+- `Uninstall.ps1` — remove autostart and stop the appliance; generated pairing state is retained unless explicitly removed.
 
 ## Why the custom BlueALSA build?
 

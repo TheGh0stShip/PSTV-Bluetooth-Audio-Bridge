@@ -43,7 +43,7 @@ out/vm/PSTV-Bluetooth-Audio-Bridge.vmdk
 ## Create a release bundle
 
 ```powershell
-.\build\New-Release.ps1 -Version 1.0.0
+.\build\New-Release.ps1 -Version 1.1.0
 ```
 
 The packager rejects VM runtime state, logs, host-key files, and management credentials. It creates a per-file manifest inside the bundle and a SHA-256 file alongside the final ZIP.

@@ -24,7 +24,7 @@ Do not force a live SBC codec change. The appliance advertises its tested low-ba
 The common cause is 2.4 GHz packet loss rather than Windows audio buffering.
 
 - Use Ethernet for the PC where possible.
-- Disable unused Wi-Fi adapters. Setup automatically disables disconnected Wi-Fi radios and records them for uninstall restoration.
+- Keep Wi-Fi enabled if it is your network connection. When possible, connect it to a 5 GHz or 6 GHz band; setup never disables or reconfigures it.
 - If the PC must use Wi-Fi, use a 5 GHz or 6 GHz network.
 - Place the PSTV and Bluetooth antenna within a few meters with clear line of sight.
 - Move USB 3 hubs, drives, and unshielded USB 3 cables away from the Bluetooth antenna.
@@ -89,4 +89,4 @@ Run:
 .\Uninstall.ps1
 ```
 
-It removes autostart, stops the VM, and re-enables only Wi-Fi adapters that setup recorded as disabled. Add `-RemoveConfiguration` only if you also want to remove generated keys and pairing-management configuration.
+It removes autostart and stops the VM. Add `-RemoveConfiguration` only if you also want to remove generated credentials and pairing-management configuration. Current releases do not disable or reconfigure Wi-Fi.

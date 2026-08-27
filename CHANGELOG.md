@@ -4,10 +4,20 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/en/1.1.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-08-26
+
+### Added
+
+- Double-click `SETUP.cmd` entry point for the complete guided Windows setup.
+- Reconnect-keeper health in `Status.ps1` output.
+
 ### Changed
 
 - Request VMware's minimum practical host audio queue (about 53 ms instead of 200 ms).
-- Add a 30/10 ms UltraLow profile and run the playback worker at modest real-time priority.
+- Make the 30/10 ms UltraLow profile the default and run the playback worker at modest real-time priority.
+- Preserve all Windows Wi-Fi adapters unchanged during installation and everyday startup.
+- Validate and document automatic trusted-PSTV reconnection after console or appliance restarts.
+- Clarify that setup automatically detects standard built-in USB-attached Bluetooth radios and external USB dongles without asking for a key, PSTV MAC, or guest IP.
 
 ## [1.0.0] - 2026-08-26
 
